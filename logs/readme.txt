@@ -1,1 +1,1 @@
-хуж╬д©б╪
+Here is the log directory
