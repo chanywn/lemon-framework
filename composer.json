@@ -1,0 +1,32 @@
+{
+    "name": "chanywn/lemon",
+    "description": "a modern php framework",
+    "type": "library",
+    "require": {
+        "php": ">=5.6.4",
+        "filp/whoops": "^2.1",
+        "monolog/monolog": "^1.22",
+        "erusev/parsedown": "^1.6"
+    },
+    "require-dev": {
+        "php": ">=5.6.4",
+        "filp/whoops": "^2.1",
+        "monolog/monolog": "^1.22",
+        "erusev/parsedown": "^1.6"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "chanywn",
+            "email": "chanywn@coedfun.cn"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "src/Lemon/Foundation/helpers.php"
+        ],
+        "psr-4": {
+             "Lemon\\": "src/Lemon/" 
+         }
+    }
+}
