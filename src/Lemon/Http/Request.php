@@ -13,21 +13,29 @@ class Request {
         $this->method = $_SERVER['REQUEST_METHOD'];
     }
 
-    public function get($param = FALSE,$default = FALSE)
+    public function get($param = FALSE, $default = FALSE)
     {
-        if($param === FALSE) {
+        if($param === FALSE && $default === FALSE) {
             return $_GET; 
-        } else {
+        } elseif($param !== FALSE && $default === FALSE) {
+            return isset($_GET[$param]) ? $_GET[$param] : NULL;
+        } else if($param !== FALSE && $default !== FALSE) {
             return isset($_GET[$param]) ? $_GET[$param] : $default;
+        } else {
+            return NULL;
         }
     }
 
-    public function post($param = FALSE)
+    public function post($param = FALSE, $default = FALSE)
     {
-        if($param === FALSE) {
-            return $_POST; 
+        if($param === FALSE && $default === FALSE) {
+            return $_POST;
+        } elseif($param !== FALSE && $default === FALSE) {
+            return isset($_POST[$param]) ? $_POST[$param] : NULL;
+        } else if($param !== FALSE && $default !== FALSE) {
+            return isset($_POST[$param]) ? $_POST[$param] : $default;
         } else {
-            return $_POST[$param];
+            return NULL;
         }
     }
 
