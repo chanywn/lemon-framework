@@ -14,6 +14,8 @@ class Database
 	private static $table;
 	// length 2-3
 	private static $where;
+
+	private static $andWhere;
 	// string
 	private static $order;
 	// length 2
@@ -62,6 +64,12 @@ class Database
         return new self;
 	}
 
+	public function andWhere($key, $value, $op = '=')
+	{
+		self::$andWhere = [$key, addslashes($value), $op];
+        return new self;
+	}
+
 	public function take($start,$num)
 	{
 		self::$limit = [$start, $num];
@@ -80,9 +88,10 @@ class Database
 			$select = "SELECT ". $keys;
 			$from  = " FROM `". self::$table . "`";
 			$where = isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
+			$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
 			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
-			return $select.$from.$where.$order.$limit;
+			return $select.$from.$where.$andWhere.$order.$limit;
 		} else {
 			return false;
 		}
@@ -94,9 +103,10 @@ class Database
 			$select = "SELECT COUNT(" . $keys . ")";
 			$from  = " FROM `". self::$table . "`";
 			$where = isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
+			$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
 			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
-			return $select.$from.$where.$order.$limit;
+			return $select.$from.$where.$andWhere.$order.$limit;
 		} else {
 			return false;
 		}
@@ -159,6 +169,7 @@ class Database
 		$sql .= "('".implode("','",$arr)."')";
 		return self::exec($sql);
 	}
+
 	public function saveId($arr)
 	{
 		foreach($arr as $key => $value){
@@ -169,9 +180,9 @@ class Database
 		$sql .="(`".implode("`,`",array_keys($arr))."`) "; 
 		$sql .=" VALUES ";
 		$sql .= "('".implode("','",$arr)."')";
-		
 		return self::execId($sql);
 	}
+
 
 	public function update($arr)
 	{
@@ -184,8 +195,10 @@ class Database
 		$sql = rtrim($sql, ",");
 		
 		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
+
+		$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
 		
-		return self::exec(rtrim($sql, ","));
+		return self::exec($sql);
 	}
 
 	public function delete()
@@ -194,6 +207,7 @@ class Database
 		$sql = '';
 		$sql .="DELETE FROM `" .self::$table. "`";
 		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
+		$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
 		return self::exec($sql);
 	}
 
@@ -221,7 +235,7 @@ class Database
 	public static function fetchAll($sql)
 	{
 		self::connection();
-		return  self::$pdo->query($sql)->fetchAll(\PDO::FETCH_OBJ);
+		return self::$pdo->query($sql)->fetchAll(\PDO::FETCH_OBJ);
 	}
 
 	public static function fetch($sql)
