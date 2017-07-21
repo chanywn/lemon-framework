@@ -12,6 +12,8 @@ class Database
 	private static $charset;
 
 	private static $table;
+
+	private static $join;
 	// length 2-3
 	private static $where;
 
@@ -57,6 +59,11 @@ class Database
 		return new self;
 	}
 	
+	public static function join($tableName)
+	{
+		self::$join = $tableName;
+		return new self;
+	}
 
 	public function where($key, $value, $op = '=')
 	{
@@ -86,12 +93,13 @@ class Database
 	{
 		if(isset(self::$table)) {
 			$select = "SELECT ". $keys;
-			$from  = " FROM `". self::$table . "`";
-			$where = isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
-			$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+			$from  = " FROM `". self::$table . "` ";
+			$join  = isset(self::$join) ? " ,`". self::$join . "` " : '';
+			$where = isset(self::$where) ? " WHERE ". self::$where[0] .' '. self::$where[2] .' '. self::$where[1].' ' : '';
+			$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' '. self::$andWhere[1].' ' : '';
 			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
-			return $select.$from.$where.$andWhere.$order.$limit;
+			return $select.$from.$join.$where.$andWhere.$order.$limit;
 		} else {
 			return false;
 		}
@@ -115,6 +123,7 @@ class Database
 	public function get($keys = '*')
 	{
 		$sql = self::spellSelectSql($keys);
+		
 		if($sql !== false) {
 			$rows = self::fetchAll($sql);
 			self::close();
@@ -194,9 +203,9 @@ class Database
 		}
 		$sql = rtrim($sql, ",");
 		
-		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
+		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] .' '. self::$where[2] .' '. self::$where[1].' ' : '';
 
-		$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+		$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' '. self::$andWhere[1].' ' : '';
 		
 		return self::exec($sql);
 	}
@@ -235,6 +244,7 @@ class Database
 	public static function fetchAll($sql)
 	{
 		self::connection();
+		// debug($sql);
 		return self::$pdo->query($sql)->fetchAll(\PDO::FETCH_OBJ);
 	}
 
