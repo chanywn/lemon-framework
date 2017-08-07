@@ -42,6 +42,10 @@ class Response
 
 	public function view($location,$model = false)
 	{
+		$file = __DIR__ . '/../../../../../../views/'.$location.'.php';
+		if(!file_exists($file)){
+	       throw new \Exception("File does not exist($file)");
+	    }
 		return include(__DIR__ . '/../../../../../../views/'.$location.'.php');
 	}
 }
