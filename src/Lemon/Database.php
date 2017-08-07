@@ -13,7 +13,7 @@ class Database
 
 	private static $table;
 
-	private static $join;
+	// private static $join;
 	// length 2-3
 	private static $where;
 
@@ -59,11 +59,11 @@ class Database
 		return new self;
 	}
 	
-	public static function join($tableName)
-	{
-		self::$join = $tableName;
-		return new self;
-	}
+	// public static function join($tableName)
+	// {
+	// 	self::$join = $tableName;
+	// 	return new self;
+	// }
 
 	public function where($key, $value, $op = '=')
 	{
@@ -94,24 +94,8 @@ class Database
 		if(isset(self::$table)) {
 			$select = "SELECT ". $keys;
 			$from  = " FROM `". self::$table . "` ";
-			$join  = isset(self::$join) ? " ,`". self::$join . "` " : '';
-			$where = isset(self::$where) ? " WHERE ". self::$where[0] .' '. self::$where[2] .' '. self::$where[1].' ' : '';
-			$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' '. self::$andWhere[1].' ' : '';
-			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
-			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
-			return $select.$from.$join.$where.$andWhere.$order.$limit;
-		} else {
-			return false;
-		}
-	}
-
-	private static function spellSelectCountSql($keys)
-	{
-		if(isset(self::$table)) {
-			$select = "SELECT COUNT(" . $keys . ")";
-			$from  = " FROM `". self::$table . "`";
-			$where = isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
-			$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+			$where = isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' "'. self::$where[1].'" ' : '';
+			$andWhere = isset(self::$andWhere) ? " AND `". self::$andWhere[0] .'` '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
 			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
 			return $select.$from.$where.$andWhere.$order.$limit;
@@ -119,6 +103,21 @@ class Database
 			return false;
 		}
 	}
+
+	// private static function spellSelectCountSql($keys)
+	// {
+	// 	if(isset(self::$table)) {
+	// 		$select = "SELECT COUNT(" . $keys . ")";
+	// 		$from  = " FROM `". self::$table . "`";
+	// 		$where = isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
+	// 		$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+	// 		$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
+	// 		$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
+	// 		return $select.$from.$where.$andWhere.$order.$limit;
+	// 	} else {
+	// 		return false;
+	// 	}
+	// }
 
 	public function get($keys = '*')
 	{
@@ -143,16 +142,16 @@ class Database
 		return false;
 	}
 
-	public function count($keys = '*')
-	{
-		$sql = self::spellSelectCountSql($keys);
-		if($sql !== false) {
-			$rows = self::fetch($sql);
-			self::close();
-			return $rows['COUNT(*)'];
-		}
-		return false;
-	}
+	// public function count($keys = '*')
+	// {
+	// 	$sql = self::spellSelectCountSql($keys);
+	// 	if($sql !== false) {
+	// 		$rows = self::fetch($sql);
+	// 		self::close();
+	// 		return $rows['COUNT(*)'];
+	// 	}
+	// 	return false;
+	// }
 
 	public function find($id, $key = 'id')
 	{

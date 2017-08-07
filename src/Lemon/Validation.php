@@ -25,13 +25,12 @@ class Validation
 		{
 			$anotherName = $attr = $attribute;
 			$attributes = explode(':', $attribute);
-			if(count($attributes) > 1){
+			if(count($attributes) > 1) {
 				$anotherName = $attributes[1];
 				$attr = $attributes[0];
 			}
 			
-			foreach (explode('|', $rule) as $key)
-			{
+			foreach (explode('|', $rule) as $key) {
 				$colon = explode(':', $key);
 				if(count($colon) > 1) {
 					$action = (string)$colon[0];
@@ -59,11 +58,14 @@ class Validation
 		        }
 			}
 		}
+
 		if(count($this->errors)) {
 	    	$this->success = false;
 	    }
 	}
-	//['required','unique','min:6','max:9','alpha','alpha_numeric','numeric','integer','email'];
+
+	//['required','unique','min:6','max:9','alpha','alpha_numeric','numeric','integer','email']
+	
 	private function str()
 	{
 		return [
@@ -80,6 +82,7 @@ class Validation
 			'ip'        => ':attribute 格式不可用'
 		];
 	}
+
 	/* 基本验证*/
 	protected function required($value)
 	{
