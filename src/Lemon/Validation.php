@@ -54,7 +54,7 @@ class Validation
 				}
 
 				if ( $reason !== true ) {
-		        	$this->errors[] = str_replace(':attribute', $anotherName, $this->reasons['required']);
+		        	$this->errors[] = str_replace(':attribute', $anotherName, $reason);
 		        	break;
 		        }
 			}
