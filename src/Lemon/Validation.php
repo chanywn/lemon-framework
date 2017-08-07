@@ -35,12 +35,26 @@ class Validation
 				$colon = explode(':', $key);
 				if(count($colon) > 1) {
 					$action = (string)$colon[0];
-					$reason = $this->$action($this->data[$attr], $colon[1]);
+					if(!isset($this->data[$attr])){
+						$this->errors[] = str_replace(':attribute', $anotherName, $this->reasons['required']);
+						break;
+					} else {
+						$reason = $this->$action($this->data[$attr], $colon[1]);
+					}
+					
 				} else {
-					$reason = $this->$key($this->data[$attr]);
+					
+					if(!isset($this->data[$attr])){
+						$this->errors[] = str_replace(':attribute', $anotherName, $this->reasons['required']);
+						break;
+
+					} else {
+						$reason = $this->$key($this->data[$attr]);
+					}
 				}
+
 				if ( $reason !== true ) {
-		        	$this->errors[] = str_replace(':attribute', $anotherName, $reason);
+		        	$this->errors[] = str_replace(':attribute', $anotherName, $this->reasons['required']);
 		        	break;
 		        }
 			}
@@ -49,7 +63,7 @@ class Validation
 	    	$this->success = false;
 	    }
 	}
-		//['required','unique','min:6','max:9','alpha','alpha_numeric','numeric','integer','email'];
+	//['required','unique','min:6','max:9','alpha','alpha_numeric','numeric','integer','email'];
 	private function str()
 	{
 		return [
