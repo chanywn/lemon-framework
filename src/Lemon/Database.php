@@ -98,10 +98,21 @@ class Database
 			$andWhere = isset(self::$andWhere) ? " AND `". self::$andWhere[0] .'` '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
 			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
-			return $select.$from.$where.$andWhere.$order.$limit;
+			$sql = $select.$from.$where.$andWhere.$order.$limit;
+			self::reset();
+			return $sql;
 		} else {
 			return false;
 		}
+	}
+
+	private static function reset()
+	{
+		self::$table = null;
+		self::$where = null;
+		self::$andWhere = null;
+		self::$order = null;
+		self::$limit = null;
 	}
 
 	// private static function spellSelectCountSql($keys)
