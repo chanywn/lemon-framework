@@ -17,6 +17,8 @@ class Database
 	// length 2-3
 	private static $where;
 
+	private static $contain;
+
 	private static $andWhere;
 	// string
 	private static $order;
@@ -58,16 +60,16 @@ class Database
 		self::$table = $tableName;
 		return new self;
 	}
-	
-	// public static function join($tableName)
-	// {
-	// 	self::$join = $tableName;
-	// 	return new self;
-	// }
 
 	public function where($key, $value, $op = '=')
 	{
 		self::$where = [$key, addslashes($value), $op];
+        return new self;
+	}
+
+	public function contain($key, $value)
+	{
+		self::$contain = [$key, addslashes($value)];
         return new self;
 	}
 
@@ -96,9 +98,10 @@ class Database
 			$from  = " FROM `". self::$table . "` ";
 			$where = isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' "'. self::$where[1].'" ' : '';
 			$andWhere = isset(self::$andWhere) ? " AND `". self::$andWhere[0] .'` '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
+			$contain = isset(self::$contain) ? " AND ".self::$contain[0] . " LIKE '%" . self::$contain[1] ."%'" : '';
 			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
-			$sql = $select.$from.$where.$andWhere.$order.$limit;
+			$sql = $select.$from.$where.$andWhere.$contain.$order.$limit;
 			self::reset();
 			return $sql;
 		} else {
@@ -111,24 +114,10 @@ class Database
 		self::$table = null;
 		self::$where = null;
 		self::$andWhere = null;
+		self::$contain = null;
 		self::$order = null;
 		self::$limit = null;
 	}
-
-	// private static function spellSelectCountSql($keys)
-	// {
-	// 	if(isset(self::$table)) {
-	// 		$select = "SELECT COUNT(" . $keys . ")";
-	// 		$from  = " FROM `". self::$table . "`";
-	// 		$where = isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
-	// 		$andWhere = isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
-	// 		$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
-	// 		$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
-	// 		return $select.$from.$where.$andWhere.$order.$limit;
-	// 	} else {
-	// 		return false;
-	// 	}
-	// }
 
 	public function get($keys = '*')
 	{
@@ -153,16 +142,6 @@ class Database
 		return false;
 	}
 
-	// public function count($keys = '*')
-	// {
-	// 	$sql = self::spellSelectCountSql($keys);
-	// 	if($sql !== false) {
-	// 		$rows = self::fetch($sql);
-	// 		self::close();
-	// 		return $rows['COUNT(*)'];
-	// 	}
-	// 	return false;
-	// }
 
 	public function find($id, $key = 'id')
 	{
@@ -205,7 +184,6 @@ class Database
 
 	public function update($arr)
 	{
-		//UPDATE persondata SET age=age*2, age=age+1;
 		$sql = '';
 		$sql .="UPDATE `" .self::$table. "` SET ";
 		foreach ($arr as $key => $value) {
@@ -222,7 +200,6 @@ class Database
 
 	public function delete()
 	{
-		//DELETE FROM 表名称 WHERE 列名称 = 值 
 		$sql = '';
 		$sql .="DELETE FROM `" .self::$table. "`";
 		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
@@ -254,7 +231,6 @@ class Database
 	public static function fetchAll($sql)
 	{
 		self::connection();
-		// debug($sql);
 		return self::$pdo->query($sql)->fetchAll(\PDO::FETCH_OBJ);
 	}
 

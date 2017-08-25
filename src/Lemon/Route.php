@@ -65,7 +65,7 @@ class Route {
             {
                 if($callbackPathArr[$i] === '(:any)') {
 
-                    if(preg_match("/[\'.,:;*?~`!@#$%^&+=)(<>{}]|\]|\[|\/|\\\|\"|\|/",$requestPathArr[$i])) { 
+                    if(preg_match("/[\'.,:;*?~`!@#$^&+=)(<>{}]|\]|\[|\/|\\\|\"|\|/",$requestPathArr[$i])) { 
                        $ErrMatchNum++;
                     } else {
                         array_push(self::$parameter, $requestPathArr[$i]);
