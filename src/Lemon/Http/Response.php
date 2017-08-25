@@ -36,7 +36,12 @@ class Response
     	if($code === '404' || $code === 404){
     		header("HTTP/1.1 404 Not Found");  
 			header("Status: 404 Not Found");
-			return $this->view('error/_404');  
+			$file = __DIR__ . '/../../../../../../views/error/_404.php';
+			if(!file_exists($file)){
+	       		return $this->write('404 Not Found'); 
+	    	}
+			return $this->view('error/_404');
+			
     	}
     }
 
@@ -46,6 +51,11 @@ class Response
 		if(!file_exists($file)){
 	       throw new \Exception("File does not exist($file)");
 	    }
+	    if($model){
+			foreach($model as $key => $value){
+				$$key = $value;
+			}
+		}
 		return include(__DIR__ . '/../../../../../../views/'.$location.'.php');
 	}
 }
