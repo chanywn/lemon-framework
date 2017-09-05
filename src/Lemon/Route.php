@@ -2,21 +2,24 @@
 namespace Lemon;
 
 class Route {
+    //HTTP Request 对象
     private static $request;
+
+    //HTTP Response 对象
     private static $response;
-    private static $app_env;
+
+    //路由参数数组
     private static $parameter;
+
     //注册的处理函数
     private static $callbacks = [];
+
     //路由匹配次数
     private static $MatchTimes = 0;
+    
     //路由回调索引
     private static $MatchRouteIndex = -1;
 
-    public static function set($arr)
-    {
-        self::$app_env = isset($arr['app_env']) ? $arr['app_env']: 'local';
-    }
 
     public static function init()
     {
@@ -105,9 +108,6 @@ class Route {
 
     public static function run()
     {
-        if(self::$app_env == 'lcoal') {
-            error_display();
-        }
         
         header('X-Powered-By:Lemon 1.0');
         self::init();
@@ -116,7 +116,7 @@ class Route {
             self::$response->statusCode(404);
         } else {
             try {
-            call_user_func_array(self::$callbacks[self::$MatchRouteIndex]['callback'], self::$parameter);
+                call_user_func_array(self::$callbacks[self::$MatchRouteIndex]['callback'], self::$parameter);
             }catch(Exception $e) {
                 error($e->getMessage());
             }

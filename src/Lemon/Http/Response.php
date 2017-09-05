@@ -28,6 +28,7 @@ class Response
 
 	public function json($words)
 	{
+		header("Content-Type:application/json");
 		echo json_encode($words);
 	}
 
