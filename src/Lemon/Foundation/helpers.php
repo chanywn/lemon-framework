@@ -2,6 +2,10 @@
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+
+date_default_timezone_set('Asia/Shanghai');
+
+
 function error_display()
 {
 	$whoops = new \Whoops\Run;
