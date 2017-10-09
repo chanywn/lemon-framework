@@ -166,7 +166,7 @@ class Validation
 	/* json */
 	protected function json($value)
 	{
-		return is_json($value) ? true : $this->reasons['json'];
+		return $this->is_json($value) ? true : $this->reasons['json'];
 	}
 	
 	public function __call($method, $parameters)
