@@ -78,8 +78,9 @@ class Validation
 			'alpha'     => ':attribute 必须仅包含字母字符', 
 			'alpha_dash'=> ':attribute 必须仅包含字母、数字、破折号',
 			'alpha_num' => ':attribute 必须仅包含字母、数字',
-			'url'       => ':attribute 格式不可用',
-			'ip'        => ':attribute 格式不可用'
+			'url'       => ':attribute 不是合法的 URL 格式',
+			'ip'        => ':attribute 不是合法的 IP 格式',
+			'json'      => ':attribute 不是合法的 JSON 格式'
 		];
 	}
 
@@ -155,6 +156,17 @@ class Validation
 	protected function alpha_dash($value)
 	{
 		return preg_match("/^[-A-Za-z0-9]+$/", $value) === 1 ? true : $this->reasons['alpha_dash'];
+	}
+
+	protected function is_json($string) { 
+		json_decode($string);
+		return (json_last_error() == JSON_ERROR_NONE);
+	}
+
+	/* json */
+	protected function json($value)
+	{
+		return is_json($value) ? true : $this->reasons['json'];
 	}
 	
 	public function __call($method, $parameters)
