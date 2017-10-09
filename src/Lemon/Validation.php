@@ -70,8 +70,9 @@ class Validation
 	{
 		return [
 			'email'     => ':attribute 格式不可用',
-			'min'       => ':attribute 长度必须大于或等于 :min',
-			'max'       => ':attribute 长度必须小于 :max.',
+			'min'       => ':attribute 长度必须大于等于 :min',
+			'max'       => ':attribute 长度必须小于等于 :max.',
+			'length'    => ':attribute 长度必须等于 :length.',
 			'required'  => ':attribute 是必填项',
 			'numeric'   => ':attribute 必须为数字',
 			'integer'   => ':attribute 必须为整数',
@@ -106,6 +107,16 @@ class Validation
 	protected function max($value, $max)
 	{
 		return mb_strlen($value, 'UTF-8') <= $max ? true : str_replace(':max', $max, $this->reasons['max']);
+	}
+
+	/*  
+	* 字符转长度 
+	* @prarm $value string
+	* @prarm $max   int
+	*/
+	protected function length($value, $length)
+	{
+		return mb_strlen($value, 'UTF-8') == $length ? true : str_replace(':length', $length, $this->reasons['length']);
 	}
 
 	/* 数字和数字字符串 包括整数、负数、小数
