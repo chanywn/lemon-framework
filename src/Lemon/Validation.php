@@ -96,7 +96,7 @@ class Validation
 
 	protected function min($value, $min)
 	{
-		return mb_strlen($value, 'UTF-8') >= $min ? true : str_replace(':min', $min, $this->reasons['min']);
+		return mb_strlen(trim($value), 'UTF-8') >= $min ? true : str_replace(':min', $min, $this->reasons['min']);
 	}
 
 	/*  
@@ -106,7 +106,7 @@ class Validation
 	*/
 	protected function max($value, $max)
 	{
-		return mb_strlen($value, 'UTF-8') <= $max ? true : str_replace(':max', $max, $this->reasons['max']);
+		return mb_strlen(trim($value), 'UTF-8') <= $max ? true : str_replace(':max', $max, $this->reasons['max']);
 	}
 
 	/*  
@@ -116,7 +116,7 @@ class Validation
 	*/
 	protected function length($value, $length)
 	{
-		return mb_strlen($value, 'UTF-8') == $length ? true : str_replace(':length', $length, $this->reasons['length']);
+		return mb_strlen(trim($value), 'UTF-8') == $length ? true : str_replace(':length', $length, $this->reasons['length']);
 	}
 
 	/* 数字和数字字符串 包括整数、负数、小数
