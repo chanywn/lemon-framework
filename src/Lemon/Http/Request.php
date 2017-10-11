@@ -39,6 +39,33 @@ class Request {
         }
     }
 
+    public function input($param = FALSE, $default = FALSE)
+    {
+        if($this->isPost()){
+            if($param === FALSE && $default === FALSE) {
+                return $_POST;
+            } elseif($param !== FALSE && $default === FALSE) {
+                return isset($_POST[$param]) ? $_POST[$param] : NULL;
+            } else if($param !== FALSE && $default !== FALSE) {
+                return isset($_POST[$param]) ? $_POST[$param] : $default;
+            } else {
+                return NULL;
+            }
+        } elseif($this->isGet()) {
+            if($param === FALSE && $default === FALSE) {
+                return $_GET; 
+            } elseif($param !== FALSE && $default === FALSE) {
+                return isset($_GET[$param]) ? $_GET[$param] : NULL;
+            } else if($param !== FALSE && $default !== FALSE) {
+                return isset($_GET[$param]) ? $_GET[$param] : $default;
+            } else {
+                return NULL;
+            }
+        } else {
+            return NULL;
+        }
+    }
+
     public function file($param = FALSE)
     {
         if($param === FALSE) {
