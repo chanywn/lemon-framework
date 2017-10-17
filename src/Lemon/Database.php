@@ -157,6 +157,10 @@ class Database
 
 	public function save($arr)
 	{
+		if(is_object($arr)){
+			$arr = get_object_vars($arr);
+		}
+
 		foreach($arr as $key => $value){
 			$arr[$key] = addslashes($value);
 		}
@@ -170,6 +174,10 @@ class Database
 
 	public function saveId($arr)
 	{
+		if(is_object($arr)){
+			$arr = get_object_vars($arr);
+		}
+		
 		foreach($arr as $key => $value){
 			$arr[$key] = addslashes($value);
 		}

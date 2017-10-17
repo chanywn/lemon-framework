@@ -43,6 +43,16 @@ class Route {
         self::map('POST',$path, $callback);
     }
 
+    public static function put($path, $callback)
+    {
+        self::map('PUT',$path, $callback);
+    }
+
+    public static function delete($path, $callback)
+    {
+        self::map('DELETE',$path, $callback);
+    }
+
     public static function any($path, $callback)
     {
         self::map('GET|POST',$path, $callback);
