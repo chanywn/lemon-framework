@@ -51,7 +51,11 @@ class Request {
             } else {
                 return NULL;
             }
+<<<<<<< HEAD
         } elseif($this->isGet() || $this->isDelete()) {
+=======
+        } elseif($this->isGet()) {
+>>>>>>> e6f953bf49bdb6ee5720facbf30bb3ad1fed9086
             if($param === FALSE && $default === FALSE) {
                 return $_GET; 
             } elseif($param !== FALSE && $default === FALSE) {
