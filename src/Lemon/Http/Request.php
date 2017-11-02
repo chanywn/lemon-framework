@@ -71,7 +71,7 @@ class Request {
         if($param === FALSE) {
             return false; 
         } else {
-            return $_FILES[$param];
+            return isset($_FILES[$param]) ? $_FILES[$param] : false;
         }
     }
 
