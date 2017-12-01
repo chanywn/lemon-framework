@@ -55,7 +55,7 @@ class Route {
 
     public static function any($path, $callback)
     {
-        self::map('GET|POST',$path, $callback);
+        self::map('OPTIONS|GET|POST|PUT|DELETE',$path, $callback);
     }
     
     private static function map($method, $path, $callback)
@@ -67,7 +67,7 @@ class Route {
         $requestPathArr = explode('/', self::$request->path);
         $callbackPathArr = explode('/',  $path);
         if(self::$request->method !== $method 
-            && $method !== 'GET|POST') { 
+            && $method !== 'OPTIONS|GET|POST|PUT|DELETE') { 
             return false; 
         }
         if(count($requestPathArr) !== count($callbackPathArr)) { return false; }
