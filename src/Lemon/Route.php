@@ -43,19 +43,19 @@ class Route {
         self::map('POST',$path, $callback);
     }
 
-    public static function put($path, $callback)
-    {
-        self::map('PUT',$path, $callback);
-    }
+    // public static function put($path, $callback)
+    // {
+    //     self::map('PUT',$path, $callback);
+    // }
 
-    public static function delete($path, $callback)
-    {
-        self::map('DELETE',$path, $callback);
-    }
+    // public static function delete($path, $callback)
+    // {
+    //     self::map('DELETE',$path, $callback);
+    // }
 
     public static function any($path, $callback)
     {
-        self::map('OPTIONS|GET|POST|PUT|DELETE',$path, $callback);
+        self::map('GET|POST',$path, $callback);
     }
     
     private static function map($method, $path, $callback)
@@ -67,7 +67,7 @@ class Route {
         $requestPathArr = explode('/', self::$request->path);
         $callbackPathArr = explode('/',  $path);
         if(self::$request->method !== $method 
-            && $method !== 'OPTIONS|GET|POST|PUT|DELETE') { 
+            && $method !== 'GET|POST') { 
             return false; 
         }
         if(count($requestPathArr) !== count($callbackPathArr)) { return false; }
@@ -126,7 +126,35 @@ class Route {
             self::$response->statusCode(404);
         } else {
             try {
-                call_user_func_array(self::$callbacks[self::$MatchRouteIndex]['callback'], self::$parameter);
+                
+                if(is_string(self::$callbacks[self::$MatchRouteIndex]['callback'])){
+                    $controller = explode('@',  self::$callbacks[self::$MatchRouteIndex]['callback']);
+                    if(count($controller) != 2){
+                        return self::$response->statusCode(404);
+                        die;
+                    }
+
+                    $file = __DIR__ . '/../../../../../controller/' . $controller[0].'.php';
+                    if(!file_exists($file)) {
+                        throw new \Exception("400123");
+                    }
+
+                    require_once($file);
+
+                    $className = "$controller[0]";
+                    $actionName = "$controller[1]";
+                    try {
+                        $class = new $className();
+                        $class->$actionName(self::$request, self::$response);
+                    }catch(Exception $e) {
+                        return self::$response->statusCode(404);
+                        die;
+                    }
+
+                }else{
+                    call_user_func_array(self::$callbacks[self::$MatchRouteIndex]['callback'], self::$parameter);
+                }
+
             }catch(Exception $e) {
                 error($e->getMessage());
             }

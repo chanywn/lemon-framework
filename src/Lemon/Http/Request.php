@@ -85,13 +85,13 @@ class Request {
         return $this->method === 'GET' ? true : false;
     }
 
-    public function isPut()
-    {
-        return $this->method === 'PUT' ? true : false;
-    }
+    // public function isPut()
+    // {
+    //     return $this->method === 'PUT' ? true : false;
+    // }
 
-    public function isDelete()
-    {
-        return $this->method === 'DELETE' ? true : false;
-    }
+    // public function isDelete()
+    // {
+    //     return $this->method === 'DELETE' ? true : false;
+    // }
 }

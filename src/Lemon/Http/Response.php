@@ -1,9 +1,13 @@
 <?php
 namespace Lemon\Http;
 
+use Lemon\Session\Flash;
+
 class Response
 {
 	private $httpCode;
+
+	private $flash;
 	
 	function __construct()
 	{
@@ -48,12 +52,24 @@ class Response
 			503 => "HTTP/1.1 503 Service Unavailable", 
 			504 => "HTTP/1.1 504 Gateway Time-out"
 		];
+
+		$this->flash = new Flash();
 	}
 
 	public function redirect($path)
 	{
 		header('Location: http://'.$_SERVER['HTTP_HOST'].$path);
 		return $this;
+	}
+
+	public function with($msg)
+	{
+		return $this->flash->save($msg);
+	}
+
+	public function getFlashMessage()
+	{
+		return $this->flash->get();
 	}
 	
 	public function back()
@@ -95,7 +111,6 @@ class Response
 		} else {
 			throw new \Exception("不存在的HTTP状态码");
 		}
-		
 	}
 	
 	public function view($location,$model = false)
@@ -109,6 +124,13 @@ class Response
 				$$key = $value;
 			}
 		}
-		return include(__DIR__ . '/../../../../../../views/'.$location.'.php');
+
+
+		$session = '';
+		if (session_id()){
+			$session = $this->getFlashMessage();
+		}
+
+		return include($file);
 	}
 }
