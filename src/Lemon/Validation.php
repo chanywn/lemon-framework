@@ -33,7 +33,9 @@ class Validation
 			foreach (explode('|', $rule) as $key) {
 				$colon = explode(':', $key);
 				if(count($colon) > 1) {
+
 					$action = (string)$colon[0];
+
 					if(!isset($this->data[$attr])){
 						$this->errors[] = str_replace(':attribute', $anotherName, $this->reasons['required']);
 						break;
@@ -81,7 +83,14 @@ class Validation
 			'alpha_num' => ':attribute 必须仅包含字母、数字',
 			'url'       => ':attribute 不是合法的 URL 格式',
 			'ip'        => ':attribute 不是合法的 IP 格式',
-			'json'      => ':attribute 不是合法的 JSON 格式'
+			'json'      => ':attribute 不是合法的 JSON 格式',
+			'word'      => ':attribute 必须仅包含中文、英文、数字',
+			'phone'     => ':attribute 不是合法的 手机号码 格式',
+			'money'     => ':attribute 不是合法的 金额 格式',
+			'numeric_min'   => ':attribute 必须大于 :numeric_min',
+			'numeric_max'   => ':attribute 长度必须小于 :numeric_max.',
+			'numeric_equal' => ':attribute 长度必须等于 :numeric_equal.',
+			// 'equal'         => ':attribute 值必须为 :value1 或 value2.',
 		];
 	}
 
@@ -169,10 +178,63 @@ class Validation
 		return preg_match("/^[-A-Za-z0-9]+$/", $value) === 1 ? true : $this->reasons['alpha_dash'];
 	}
 
+	/* 验证字段值是否仅包含中文、英文、数字 */
+	protected function word($value)
+	{
+		//^[\u4E00-\u9FA5A-Za-z0-9]+$ 或 ^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$
+		return preg_match("/^[\u4E00-\u9FA5A-Za-z0-9]+$/", $value) === 1 ? true : $this->reasons['word'];
+	}
+
+	/* 验证字段值是否为手机号 */
+	protected function phone($value)
+	{
+		//
+		return preg_match("/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/", $value) === 1 ? true : $this->reasons['phone'];
+	}
+
+	/*  
+	* 数字小于
+	* @prarm $value string
+	* @prarm $max   int
+	*/
+	protected function numeric_min($value, $min)
+	{
+		return $min < $value ? true : str_replace(':numeric_min', $min, $this->reasons['numeric_min']);
+	}
+
+	/*  
+	* 数字大于
+	* @prarm $value string
+	* @prarm $max   int
+	*/
+	protected function numeric_max($value, $max)
+	{
+		return $max > $value  ? true : str_replace(':numeric_max', $max, $this->reasons['numeric_max']);
+	}
+
+	/*  
+	* 数字等于
+	* @prarm $value string
+	* @prarm $max   int
+	*/
+	protected function numeric_equal($value, $equal)
+	{
+		return $value == $min ? true : str_replace(':numeric_equal', $equal, $this->reasons['numeric_equal']);
+	}
+
+	/* 金额 0.00、23.09 */
+	protected function money($value)
+	{
+		return is_float($value) && round($value,2) == $value ?  true : $this->reasons['money'];
+	}
+	
+
 	protected function is_json($string) { 
 		json_decode($string);
 		return (json_last_error() == JSON_ERROR_NONE);
 	}
+
+	
 
 	/* json */
 	protected function json($value)

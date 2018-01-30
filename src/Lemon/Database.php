@@ -37,6 +37,7 @@ class Database
 				),
 				self::$username, self::$password
 			);
+			self::$pdo->setAttribute(\PDO::ATTR_ERRMODE,\PDO::ERRMODE_WARNING);
 		} catch (PDOException $e) {
 			error($e->getMessage());
 			exit();
@@ -169,6 +170,8 @@ class Database
 		$sql .="(`".implode("`,`",array_keys($arr))."`) "; 
 		$sql .=" VALUES ";
 		$sql .= "('".implode("','",$arr)."')";
+		self::reset();
+
 		return self::exec($sql);
 	}
 
@@ -186,6 +189,8 @@ class Database
 		$sql .="(`".implode("`,`",array_keys($arr))."`) "; 
 		$sql .=" VALUES ";
 		$sql .= "('".implode("','",$arr)."')";
+
+		self::reset();
 		return self::execId($sql);
 	}
 
@@ -195,14 +200,29 @@ class Database
 		$sql = '';
 		$sql .="UPDATE `" .self::$table. "` SET ";
 		foreach ($arr as $key => $value) {
-			$sql .= '`'.$key.'`'. '=' ."'". addslashes($value) ."',";
+			if(is_numeric($value)){
+				$sql .= '`'.$key.'`'. ' = ' . $value . ', ';
+			} else {
+				$sql .= '`'.$key.'`'. ' = ' .' "'. addslashes($value) .'", ';
+			}
+			
 		}
-		$sql = rtrim($sql, ",");
+		$sql = rtrim($sql, ", ");
 		
-		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] .' '. self::$where[2] .' '. self::$where[1].' ' : '';
+		if(is_numeric(self::$where[1])){
+			$sql .= isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' '. self::$where[1].' ' : '';
+		} else {
+			$sql .= isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' "'. self::$where[1].'" ' : '';
+		}
 
-		$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' '. self::$andWhere[1].' ' : '';
-		
+		if(is_numeric(self::$andWhere[1])){
+			$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' '. self::$andWhere[1].' ' : '';
+		} else {
+			$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
+		}
+
+		self::reset();
+
 		return self::exec($sql);
 	}
 
@@ -212,6 +232,9 @@ class Database
 		$sql .="DELETE FROM `" .self::$table. "`";
 		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
 		$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+
+		self::reset();
+		
 		return self::exec($sql);
 	}
 
