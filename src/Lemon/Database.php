@@ -99,7 +99,7 @@ class Database
 			$from  = " FROM `". self::$table . "` ";
 			$where = isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' "'. self::$where[1].'" ' : '';
 			$andWhere = isset(self::$andWhere) ? " AND `". self::$andWhere[0] .'` '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
-			$contain = isset(self::$contain) ? " AND ".self::$contain[0] . " LIKE '%" . self::$contain[1] ."%'" : '';
+			$contain = isset(self::$contain) ? " WHERE ".self::$contain[0] . " LIKE '%" . self::$contain[1] ."%'" : '';
 			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
 			$sql = $select.$from.$where.$andWhere.$contain.$order.$limit;
