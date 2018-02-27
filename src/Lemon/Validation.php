@@ -225,7 +225,7 @@ class Validation
 	/* 金额 0.00、23.09 */
 	protected function money($value)
 	{
-		return is_float($value) && round($value,2) == $value ?  true : $this->reasons['money'];
+		return is_float($value) ?  true : $this->reasons['money'];
 	}
 	
 
