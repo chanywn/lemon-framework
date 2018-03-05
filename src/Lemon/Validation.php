@@ -182,7 +182,7 @@ class Validation
 	protected function word($value)
 	{
 		//^[\u4E00-\u9FA5A-Za-z0-9]+$ 或 ^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$
-		return preg_match("/^[\x{4e00}-\x{9fa5}-Za-z0-9]+$/", $value) === 1 ? true : $this->reasons['word'];
+		return preg_match("/^[-A-Za-z0-9\x{4e00}-\x{9fa5}]+$/u", $value) === 1 ? true : $this->reasons['word'];
 	}
 
 	/* 验证字段值是否为手机号 */

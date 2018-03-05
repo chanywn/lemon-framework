@@ -200,7 +200,7 @@ class Database
 		$sql = '';
 		$sql .="UPDATE `" .self::$table. "` SET ";
 		foreach ($arr as $key => $value) {
-			if(is_numeric($value)){
+			if( (is_int($value) || is_float($value)) && !is_string($value) ){
 				$sql .= '`'.$key.'`'. ' = ' . $value . ', ';
 			} else {
 				$sql .= '`'.$key.'`'. ' = ' .' "'. addslashes($value) .'", ';
@@ -209,13 +209,13 @@ class Database
 		}
 		$sql = rtrim($sql, ", ");
 		
-		if(is_numeric(self::$where[1])){
+		if((is_int(self::$where[1]) || is_float(self::$where[1])) && !is_string(self::$where[1])) {
 			$sql .= isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' '. self::$where[1].' ' : '';
 		} else {
 			$sql .= isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' "'. self::$where[1].'" ' : '';
 		}
 
-		if(is_numeric(self::$andWhere[1])){
+		if( (is_int(self::$andWhere[1]) || is_float(self::$andWhere[1])) && !is_string(self::$andWhere[1]) ) {
 			$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' '. self::$andWhere[1].' ' : '';
 		} else {
 			$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
@@ -230,8 +230,21 @@ class Database
 	{
 		$sql = '';
 		$sql .="DELETE FROM `" .self::$table. "`";
-		$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
-		$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+
+		//$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
+		//$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+
+		if((is_int(self::$where[1]) || is_float(self::$where[1])) && !is_string(self::$where[1])) {
+			$sql .= isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' '. self::$where[1].' ' : '';
+		} else {
+			$sql .= isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' "'. self::$where[1].'" ' : '';
+		}
+
+		if( (is_int(self::$andWhere[1]) || is_float(self::$andWhere[1])) && !is_string(self::$andWhere[1]) ) {
+			$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' '. self::$andWhere[1].' ' : '';
+		} else {
+			$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] .' '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
+		}
 
 		self::reset();
 		
