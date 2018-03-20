@@ -2,35 +2,22 @@
 namespace Lemon;
 
 class Route {
-    //HTTP Request 对象
-    private static $request;
+    private static $request = null;
 
-    //HTTP Response 对象
-    private static $response;
+    private static $response = null;
 
-    //路由参数数组
-    private static $parameter;
+    private static $parameter = [];
 
-    //注册的处理函数
     private static $callbacks = [];
 
-    //路由匹配次数
-    private static $MatchTimes = 0;
-    
-    //路由回调索引
-    private static $MatchRouteIndex = -1;
+    private static $anyPreg = "/[\'.,:;*?~`!@#$^&+=)(<>{}]|\]|\[|\/|\\\|\"|\|/";
 
 
-    public static function init()
-    {
+    public static function initialise()
+    {   
         self::$request = new \Lemon\Http\Request();
         self::$response =new \Lemon\Http\Response();
-        self::$parameter = [];
-
         array_push(self::$parameter, self::$request, self::$response);
-
-        self::$MatchTimes = 0;
-        self::$MatchRouteIndex = -1;
     }
 
     public static function get($path, $callback)
@@ -43,19 +30,24 @@ class Route {
         self::map('POST',$path, $callback);
     }
 
-    // public static function put($path, $callback)
-    // {
-    //     self::map('PUT',$path, $callback);
-    // }
+    public static function put($path, $callback)
+    {
+        self::map('PUT',$path, $callback);
+    }
 
-    // public static function delete($path, $callback)
-    // {
-    //     self::map('DELETE',$path, $callback);
-    // }
+    public static function delete($path, $callback)
+    {
+        self::map('DELETE',$path, $callback);
+    }
+
+    public static function options($path, $callback)
+    {
+        self::map('OPTIONS',$path, $callback);
+    }
 
     public static function any($path, $callback)
     {
-        self::map('GET|POST',$path, $callback);
+        self::map('ANY',$path, $callback);
     }
     
     private static function map($method, $path, $callback)
@@ -63,45 +55,41 @@ class Route {
         array_push(self::$callbacks, ['method'=> $method, 'path' => $path, 'callback' => $callback]);
     }
     
-    private static function match($method, $path) {
+    private static function match($method, $path) 
+    {
         $requestPathArr = explode('/', self::$request->path);
+        
         $callbackPathArr = explode('/',  $path);
-        if(self::$request->method !== $method 
-            && $method !== 'GET|POST') { 
-            return false; 
-        }
-        if(count($requestPathArr) !== count($callbackPathArr)) { return false; }
-        $ErrMatchNum = 0;
-        for($i=0; $i<count($requestPathArr); $i++) 
+
+        if($method !== self::$request->method && $method !== 'ANY') return false;
+
+        if(count($requestPathArr) !== count($callbackPathArr))  return false;
+
+        for($i=0; $i<count($requestPathArr); $i++)
         {
             if($requestPathArr[$i] !== $callbackPathArr[$i]) 
             {
-                if($callbackPathArr[$i] === '(:any)') {
-
-                    if(preg_match("/[\'.,:;*?~`!@#$^&+=)(<>{}]|\]|\[|\/|\\\|\"|\|/",$requestPathArr[$i])) { 
-                       $ErrMatchNum++;
-                    } else {
+                if($callbackPathArr[$i] === "(:any)")
+                {
+                    if(preg_match(self::$anyPreg, $requestPathArr[$i]))
+                        return false;
+                    else
                         array_push(self::$parameter, $requestPathArr[$i]);
-                        continue;
-                    }
-                    
-                } elseif($callbackPathArr[$i] === '(:num)'){
-                   if(is_numeric($requestPathArr[$i])) {
-                       array_push(self::$parameter, $requestPathArr[$i]);
-                       continue;
-                   } else {
-                       $ErrMatchNum++;
-                   }
-                } else {
-                    $ErrMatchNum++;
+                } 
+                elseif($callbackPathArr[$i] === '(:num)')
+                {
+                    if(is_numeric($requestPathArr[$i]))
+                        array_push(self::$parameter, $requestPathArr[$i]);
+                    else 
+                        return false;
+                }   
+                else
+                {
+                    return false;
                 }
             }
         }
-        if($ErrMatchNum === 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     private static function preprocessing()
@@ -110,54 +98,21 @@ class Route {
         {
             if(self::match(self::$callbacks[$i]['method'], self::$callbacks[$i]['path'])) 
             {
-                self::$MatchRouteIndex = $i;
-                self::$MatchTimes++;
+                return $i;
             }
         }
+        return false;
     }
 
     public static function run()
     {
-        
         header('X-Powered-By:Lemon 1.0');
-        self::init();
-        self::preprocessing();
-        if( self::$MatchTimes !== 1 || self::$MatchRouteIndex === -1) {
-            self::$response->statusCode(404);
-        } else {
-            try {
-                
-                if(is_string(self::$callbacks[self::$MatchRouteIndex]['callback'])){
-                    $controller = explode('@',  self::$callbacks[self::$MatchRouteIndex]['callback']);
-                    if(count($controller) != 2){
-                        return self::$response->statusCode(404);
-                        die;
-                    }
+        self::initialise();
+        $_i = self::preprocessing();
 
-                    $file = __DIR__ . '/../../../../../controller/' . $controller[0].'.php';
-                    if(!file_exists($file)) {
-                        throw new \Exception("400123");
-                    }
+        if($_i ===  false)
+            self::$response->code(404);
 
-                    require_once($file);
-
-                    $className = "$controller[0]";
-                    $actionName = "$controller[1]";
-                    try {
-                        $class = new $className();
-                        $class->$actionName(self::$request, self::$response);
-                    }catch(Exception $e) {
-                        return self::$response->statusCode(404);
-                        die;
-                    }
-
-                }else{
-                    call_user_func_array(self::$callbacks[self::$MatchRouteIndex]['callback'], self::$parameter);
-                }
-
-            }catch(Exception $e) {
-                error($e->getMessage());
-            }
-        }
+        call_user_func_array(self::$callbacks[$_i]['callback'], self::$parameter);
     }
 }
