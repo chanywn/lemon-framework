@@ -110,9 +110,10 @@ class Route {
         self::initialise();
         $_i = self::preprocessing();
 
-        if($_i ===  false)
-            self::$response->code(404);
-
-        call_user_func_array(self::$callbacks[$_i]['callback'], self::$parameter);
+        if($_i === false) {
+            return self::$response->code(404);
+        } else {
+            call_user_func_array(self::$callbacks[$_i]['callback'], self::$parameter);
+        }
     }
 }

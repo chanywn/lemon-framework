@@ -45,20 +45,6 @@ class Response
 		echo json_encode($words);
 	}
 
-	public function statusCode($code)
-    {
-    	if($code === '404' || $code === 404){
-    		header("HTTP/1.1 404 Not Found");  
-			header("Status: 404 Not Found");
-			$file = __DIR__ . '/../../../../../../views/error/_404.php';
-			if(!file_exists($file)){
-	       		return $this->write('404 Not Found'); 
-	    	}
-			return $this->view('error/_404');
-			
-    	}
-    }
-
 	public function code($code)
     {
 		$httpCode = [
@@ -105,9 +91,13 @@ class Response
 
 		if(isset($httpCode[$code])){
 			header($httpCode[$code]);
+
+			if($code == 404)
+				if(file_exists(__DIR__ . '/../../../../../../views/_error/404.php')) return $this->view('_error/404');
+			
 			return;
 		} else {
-			throw new \Exception("不存在的HTTP状态码");
+			throw new \Exception("非法的HTTP状态码");
 		}
 	}
 	
@@ -116,13 +106,34 @@ class Response
 		$file = __DIR__ . '/../../../../../../views/'.$location.'.php';
 		if(!file_exists($file)){
 	       throw new \Exception("File does not exist($file)");
-	    }
-	    if($model){
+		}
+		
+	    if($model) {
 			foreach($model as $key => $value){
 				$$key = $value;
 			}
 		}
 
+		$session = '';
+		if (session_id()){
+			$session = $this->getFlashMessage();
+		}
+
+		return include($file);
+	}
+
+	public function render($location,$model = false)
+	{
+		$file = __DIR__ . '/../../../../../../views/'.$location.'.html';
+		if(!file_exists($file)){
+	       throw new \Exception("File does not exist($file)");
+		}
+		
+	    if($model) {
+			foreach($model as $key => $value){
+				$$key = $value;
+			}
+		}
 
 		$session = '';
 		if (session_id()){
