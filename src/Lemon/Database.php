@@ -194,6 +194,29 @@ class Database
 		return self::execId($sql);
 	}
 
+	public function saveList($arr)
+	{
+		if(count($arr) < 2) return;
+
+		$table = self::$table;
+
+		$k = implode("`,`",$arr[0]);
+
+		$sql ="INSERT INTO `{$table}` ";
+		
+		$sql .="(`".$k."`) VALUES "; 
+		
+		for($i = 1; $i< count($arr); $i++)
+		{
+			$d = $i === 1 ? "" : ",";
+
+			$sql .= "{$d} ('".implode("','",$arr[$i])."')";
+		}
+		self::reset();
+
+		return self::exec($sql);
+	}
+
 
 	public function update($arr)
 	{
