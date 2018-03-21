@@ -86,9 +86,9 @@ class Database
         return new self;
 	}
 
-	public function orderBy($key)
+	public function orderBy($key,$by = 'DESC')
 	{
-		self::$order = $key;
+		self::$order = (object)['key' => $key, 'by' => $by];
         return new self;
 	}
 
@@ -100,7 +100,7 @@ class Database
 			$where = isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' "'. self::$where[1].'" ' : '';
 			$andWhere = isset(self::$andWhere) ? " AND `". self::$andWhere[0] .'` '. self::$andWhere[2] .' "'. self::$andWhere[1].'" ' : '';
 			$contain = isset(self::$contain) ? " WHERE ".self::$contain[0] . " LIKE '%" . self::$contain[1] ."%'" : '';
-			$order = isset(self::$order) ? (" ORDER BY " . self::$order . " DESC") : '';
+			$order = isset(self::$order) ? (" ORDER BY " . self::$order->key . " ".self::$order->by) : '';
 			$limit = isset(self::$limit) ? (" LIMIT " . self::$limit[0] . ",") . self::$limit[1] : '';
 			$sql = $select.$from.$where.$andWhere.$contain.$order.$limit;
 			self::reset();
@@ -165,33 +165,14 @@ class Database
 		foreach($arr as $key => $value){
 			$arr[$key] = addslashes($value);
 		}
-		$sql = '';
-		$sql .="INSERT INTO `" .self::$table. "` ";
+
+		$sql  ="INSERT INTO `" .self::$table. "` ";
 		$sql .="(`".implode("`,`",array_keys($arr))."`) "; 
 		$sql .=" VALUES ";
 		$sql .= "('".implode("','",$arr)."')";
 		self::reset();
 
 		return self::exec($sql);
-	}
-
-	public function saveId($arr)
-	{
-		if(is_object($arr)){
-			$arr = get_object_vars($arr);
-		}
-		
-		foreach($arr as $key => $value){
-			$arr[$key] = addslashes($value);
-		}
-		$sql = '';
-		$sql .="INSERT INTO `" .self::$table. "` ";
-		$sql .="(`".implode("`,`",array_keys($arr))."`) "; 
-		$sql .=" VALUES ";
-		$sql .= "('".implode("','",$arr)."')";
-
-		self::reset();
-		return self::execId($sql);
 	}
 
 	public function saveList($arr)
@@ -217,11 +198,29 @@ class Database
 		return self::exec($sql);
 	}
 
+	public function saveId($arr)
+	{
+		if(is_object($arr)){
+			$arr = get_object_vars($arr);
+		}
+		
+		foreach($arr as $key => $value){
+			$arr[$key] = addslashes($value);
+		}
+		$sql = '';
+		$sql .="INSERT INTO `" .self::$table. "` ";
+		$sql .="(`".implode("`,`",array_keys($arr))."`) "; 
+		$sql .=" VALUES ";
+		$sql .= "('".implode("','",$arr)."')";
+
+		self::reset();
+		return self::execId($sql);
+	}
+
 
 	public function update($arr)
 	{
-		$sql = '';
-		$sql .="UPDATE `" .self::$table. "` SET ";
+		$sql ="UPDATE `" .self::$table. "` SET ";
 		foreach ($arr as $key => $value) {
 			if( (is_int($value) || is_float($value)) && !is_string($value) ){
 				$sql .= '`'.$key.'`'. ' = ' . $value . ', ';
@@ -251,11 +250,7 @@ class Database
 
 	public function delete()
 	{
-		$sql = '';
-		$sql .="DELETE FROM `" .self::$table. "`";
-
-		//$sql .= isset(self::$where) ? " WHERE ". self::$where[0] . self::$where[2] .'"'. self::$where[1].'"' : '';
-		//$sql .= isset(self::$andWhere) ? " AND ". self::$andWhere[0] . self::$andWhere[2] .'"'. self::$andWhere[1].'"' : '';
+		$sql ="DELETE FROM `" .self::$table. "`";
 
 		if((is_int(self::$where[1]) || is_float(self::$where[1])) && !is_string(self::$where[1])) {
 			$sql .= isset(self::$where) ? " WHERE `". self::$where[0] .'` '. self::$where[2] .' '. self::$where[1].' ' : '';
